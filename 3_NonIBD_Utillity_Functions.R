@@ -37,12 +37,7 @@ permute_FET = function(nperm, sample_data){
   ccLabel = sample_data$Genos$ccStatus
   
   
-  # permute_indx is a matrix of indices for each permutation. 
-  permute_indx = matrix(NA, nrow = nperm, ncol = length(ccLabel) )
-  for(i in 1:nperm){
-    permute_indx[i,] = sample( x = 1:length(ccLabel), replace = FALSE)
-  }
-  
+  load('permute_indx.RData')
   
 
   # Running the permutation in parallel
@@ -160,11 +155,7 @@ permute_SKATO = function(nperm, sample_data){
   ccLabel = sample_data$Genos$ccStatus
   
   
-  # permute_indx is a matrix of indices for each permutation. 
-  permute_indx = matrix(NA, nrow = nperm, ncol = length(ccLabel) )
-  for(i in 1:nperm){
-    permute_indx[i,] = sample( x = 1:length(ccLabel), replace = FALSE)
-  }
+  load('permute_indx.RData')
   
   
   # Running the permutation

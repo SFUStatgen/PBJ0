@@ -148,7 +148,7 @@ Simulate_Population_Data = function(prob_disease, causal_region, N1, equifrequen
 # 2. nCase: The desired number of case individuals in the sample.
 # 3. nCon: The desired number of control individuals in the sample.
 # 4. min_clade_size: The minimum number of case sequences that each cSNV clade should have in the sample. 
-Sample_from_population   = function(pop_data, nCase, nCon, min_clade_size){
+Sample_from_population   = function(pop_data, nCase, nCon){
   
   
   Variants                  = pop_data$Variants
@@ -157,41 +157,21 @@ Sample_from_population   = function(pop_data, nCase, nCon, min_clade_size){
   Positions                 = pop_data$Positions
   cSNV                      = pop_data$cSNV
   
-  stop.condition            = FALSE
-  while( stop.condition == FALSE){
+
+    
+  # Randomly select case and control from the population, respectively.
+  D_case.sample    = sample( x = pop_data$DISCRETE[[1]], size = nCase ) 
+  D_control.sample = sample( x = pop_data$DISCRETE[[2]], size = nCon  ) 
     
     
-    # Randomly select case and control from the population, respectively.
-    D_case.sample    = sample( x = pop_data$DISCRETE[[1]], size = nCase ) 
-    D_control.sample = sample( x = pop_data$DISCRETE[[2]], size = nCon  ) 
+  # We find the sequences/haplotypes of each individual in the case and control sample.
+  # Find_Sequences_of_Individuals() function takes the list of individuals label and population mapping.
+  # It returns the sequence/haplotype labels of the case/control sample.
+  D_case_haplotypes    = Find_Sequences_of_Individuals(ind_list = D_case.sample ,    PM = Population.Mapping)
+  D_control_haplotypes = Find_Sequences_of_Individuals(ind_list = D_control.sample , PM = Population.Mapping)
     
-    
-    # We find the sequences/haplotypes of each individual in the case and control sample.
-    # Find_Sequences_of_Individuals() function takes the list of individuals label and population mapping.
-    # It returns the sequence/haplotype labels of the case/control sample.
-    D_case_haplotypes    = Find_Sequences_of_Individuals(ind_list = D_case.sample ,    PM = Population.Mapping)
-    D_control_haplotypes = Find_Sequences_of_Individuals(ind_list = D_control.sample , PM = Population.Mapping)
-    
-    
-    # cSNV_HapMat: A matrix representing the cSNV carrier status of each case sequences/haplotypes in the sample.
-    # We use this matrix to count the number of case sequences/haplotypes that are carrying cSNV.
-    # We save it in Carrier_Case_Haplo variable. 
-    cSNV_HapMat           = Variants[cSNV, D_case_haplotypes ]
-    Carrier_Case_Haplo    = rowSums(cSNV_HapMat)
-    
-    # Check if the number of carrier case sequences/haplotypes at each SNV clade is at least greater 
-    # than min_clade_size. If this condition is met, we stop sampling. Otherwise we throw the sample
-    # and randomly select another sample. Usually within two or three sampling the conditions are met.
-    check = Carrier_Case_Haplo
-    check = check[ check != 0 ]
-    
-    
-    if( all(check >= min_clade_size) ){
-      stop.condition = TRUE
-    }
-    
-  }
   
+
   
   # Remove any SNV with no variation in the sample
   sample_variants = Variants[ ,  c(D_case_haplotypes,D_control_haplotypes) ]

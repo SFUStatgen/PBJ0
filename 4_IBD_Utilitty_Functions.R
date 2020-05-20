@@ -87,15 +87,12 @@ dCorN_permute          = function(nperm, sample_data, distance_matrix_list){
   
   
   # ccLabel is the original case/control labeling of the individuals.
-  ccLabel = sample_data$Haps$ccStatus
+  ccLabel = sample_data$Genos$ccStatus
+
   
   
-  # permute_indx is a matrix of indices for each permutation. 
-  permute_indx = matrix(NA, nrow = nperm, ncol = length(ccLabel) )
-  for(i in 1:nperm){
-    permute_indx[i,] = sample( x = 1:length(ccLabel), replace = FALSE)
-  }
-  
+  # Load the permutation indices
+  load("permute_indx.RData")
 
   
   # Running the permutation in parallel
@@ -122,7 +119,7 @@ dCorN_permute          = function(nperm, sample_data, distance_matrix_list){
   
   res = foreach(i = 1:nperm, .export = c("dCor_Profile","pheno_dist_matrix_calc") ) %dopar%{
            SeqID         = c(sample_data$CaseHapID, sample_data$ControlHapID) 
-           Status        = ccLabel[ permute_indx[i,] ]
+           Status        = unlist( lapply( ccLabel[ permute_indx[i,] ], FUN = function(x){rep(x,2)} ) )
            pCCLabel      = data.frame(SeqID = SeqID, Status = Status)
            dCor_Profile(cc_sample = pCCLabel, distance_matrix_list)
   }

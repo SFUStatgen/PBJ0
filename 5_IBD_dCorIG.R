@@ -55,7 +55,7 @@ CClabels   = data.frame( SeqID = SeqID, Status = Status )
 # First column is the sequence labels
 # Second column is the case/control status of each sequence.
 #
-dCorIG_Profile = dCorIG(partition_list = part, w = weight.vector, distance_matrix_list = dists, CClabels = CClabels )
+dCorIG_Profile = dCorIG(partition_list = part, w = weight.vector, distance_matrix_list = dists, CClabels = CClabels, q_cut_off = 0.25 )
 save( dCorIG_Profile, file = "dCorIG.RData")
 
 
@@ -71,7 +71,7 @@ save( dCorIG_Profile, file = "dCorIG.RData")
 # 
 number_of_permutations  = 1000
 start.time = Sys.time()
-dCorIG_permutation      = dCorIG_permute(nperm = number_of_permutations, sample_data, partition_list = part, w = weight.vector, distance_matrix_list = dists)
+dCorIG_permutation      = dCorIG_permute(nperm = number_of_permutations, sample_data, partition_list = part, w = weight.vector, distance_matrix_list = dists, q_cut_off = 0.25)
 end.time = Sys.time()
 print(end.time - start.time )
 

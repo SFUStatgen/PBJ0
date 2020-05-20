@@ -36,7 +36,7 @@ source('1_SimulateData_Utillity_Functions.R')
 pop_data = Simulate_Population_Data(prob_disease = 0.05,
                                     causal_region = c(900000,1100000),
                                     N1 = 155, 
-                                    equifrequent_cSNV = 4, 
+                                    equifrequent_cSNV = 6, 
                                     Beta0 = -10,
                                     Beta  = 16
                                     )
@@ -56,9 +56,7 @@ pop_data = Simulate_Population_Data(prob_disease = 0.05,
 #
 # 3. nCon is the desired number of control individuals we want to sample from this population.
 # 
-# 4. min_clade_size indicates the minimum number of case sequences in the clade descending from each cSNV in the sample.
-#
-sample_data = Sample_from_population(pop_data, nCase = 50, nCon = 50, min_clade_size = 12)
+sample_data = Sample_from_population(pop_data, nCase = 50, nCon = 50)
 
 
 
@@ -95,14 +93,42 @@ sample_data = Sample_from_population(pop_data, nCase = 50, nCon = 50, min_clade_
 
 
 
-# Step 4. Save the population data as pop_data.RData.
-#         Save the sample data as sample_data.RData.
-# 
-#         We need this data in the next scripts where we do IBD and none-IBD based methods.
-# 
-save(pop_data,    file = "pop_data.RData")
-save(sample_data, file = "sample_data.RData")
 
+
+
+# 
+# Step4. Create the permutation indices for all methods:
+# 
+# permute_indx is a matrix of indices for each permutation. 
+#
+nperm = 1000
+ccLabel = sample_data$Genos$ccStatus
+
+
+permute_indx = matrix(NA, nrow = nperm, ncol = length(ccLabel) )
+for(i in 1:nperm){
+  permute_indx[i,] = sample( x = 1:length(ccLabel), replace = FALSE)
+}
+
+
+
+
+
+
+# Step 5. Save the population data as pop_data.RData.
+#         Save the sample data as sample_data.RData.
+#         Save the permutation indices.
+#         We need this data in the next scripts where we do IBD and none-IBD based methods.
+#
+#
+# Important note:
+# Make sure that all the files and scripts for each simulated dataset are at the same directory. 
+# Otherwisw this file would not load.
+#
+
+save(pop_data,         file = "pop_data.RData")
+save(sample_data,      file = "sample_data.RData")
+save(x = permute_indx, file = 'permute_indx.RData')
 
 
 
@@ -127,7 +153,7 @@ Variants                  = pop_data$Variants
 cSNV                      = pop_data$cSNV
 D_case_haplotypes         = Find_Sequences_of_Individuals(sample_data$CaseIND,    PM = pop_data$Population.Mapping)
 D_control_haplotypes      = Find_Sequences_of_Individuals(sample_data$ControlIND, PM = pop_data$Population.Mapping)
-derived.allele.frequency  = rowSums( Variants[, c(D_case_haplotypes,D_control_haplotypes)] ) / ncol(Variants)
+derived.allele.frequency  = rowSums( Variants ) / ncol(Variants)
 derived.allele.percentage = derived.allele.frequency * 100
 cSNV_HapMat = Variants[cSNV, c(D_case_haplotypes , D_control_haplotypes) ]
 dim(cSNV_HapMat)
