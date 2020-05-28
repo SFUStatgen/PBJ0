@@ -1,2 +1,2 @@
 # PBJ0
-Repository for Payman and Bhagya's project
+Repository for Payman's and Bhagya's project
