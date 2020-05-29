@@ -1,3 +1,23 @@
-This folder contains the results for the example dataset. 
-This example dataset is selected from 200 simulated datsets on May 26. 
-The example dataset number is 22.
+Dataset22 folder:
+(*) This folder contains the results for the example dataset which is selected from 200 simulated datsets on May 26. 
+(*) The example dataset number is 22.
+
+
+################################################################
+The files/folder in this folder and their description:
+1) FastPhaseDir folder Contains the estimated parameters for hmm model. The parameters has been estimated by fastPHASE software.
+2) IBD_methods.pdf contains 3 dCor profile plots: (i) dCorN, (ii) dCorIT, and (iii) dCorIG. 
+3) Knockoff_report.Rmd and Knockoff_report.pdf are the Rmarkdown report files for knockoff procedure on this example dataset. 
+4) Table1_cSNV_sample_info.txt is table representing the cSNV derived allele frequency (DAF) in the sample. Also reporting the number of case/control sequences that are carrying each cSNV.
+5) Table2_cSNV_population_info.txt is the same as table1 but all measured in the population of 3100 individuals.
+6) TreeSequence.trees is the tree sequence file generated for this example dataset by Python msprime package.
+7) dCorIG.RData is an R's data object, holding the dCorIG profile along the genome.
+8) dCorKnockoff.R main R script developed by JG for running kockoff procedure. 
+9) dCorKnockoff.Rout is the output of this script after run on ComputeCanada (I uploaded this file ait contains the running time. For 1000 knockoff samples with 100 requested processors it took 6855.047 second = 1.90 hours to run.)
+10) dCorKnockoff.sh the batch script used for submitting job on computecanda.
+11) dCorN.RData is an R's data object, holding the dCorN profile along the genome.
+12) dCorNIGko.csv is a dataframe with 2 columns (dCorN and dCorIG) and 1000 rows. Each row represents the maximum of the profile (dCorN or dCorIG) when we use knockoff samples.
+13) non_IBD_methods.pdf contains 2 dCor profile plots: (i) FET (Fishers exact test), (ii) SKATO. 
+################################################################
+   
+
