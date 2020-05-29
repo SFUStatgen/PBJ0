@@ -1,0 +1,2 @@
+/home/pnickchi/./fastPHASE -Pp -T1 -K12 -g -H-4 -C25 -B -S1 -o/scratch/pnickchi/Dataset22/FastPhaseDir/out FastPhaseDir/haplotype.inp 
+1	-9408.980530
