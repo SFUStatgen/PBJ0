@@ -1,0 +1,59 @@
+---
+title: "Knockoff report for example dataset: #22"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+In this report, we look at the results from knockoff procedure for our example dataset, Dataset22. This is an example dataset, selected from the results we had on May 26, 2020. In this dataset, both IBD based methods (dCorN and dCorIG) localize the peak in the risk region. In addition, none of the non-IBD based methods are able to localize the peak in the risk region. The profiles are demonstrated in [non_IBD_methods.PDF], [IBD_methods.PDF] for non-IBD and IBD-based methods, respectively. 
+
+
+1. We first load all the data that is necessary: 
+
+(i)  dCorN.RData: holding the Naive dCor profile along the genome.
+(ii) dCorIG.RData: holding the dCorIG profile along the genome.
+(ii) dCorNIGko.csv: Results from JG's scripts (fitknock.R and dCorKnockoff.R). This csv file records a dataframe with 2 columns (dCorN and dCorIG) and 1000 rows. Each row of this dataframe records the maximum value of the dCor (either N or IG) along the genome when we use knockoff samples.   
+
+```{r}
+load('dCorN.RData')
+load('dCorIG.RData')
+ko_csv = read.csv(file = 'dCorNIGko.csv', header = TRUE)
+dim(ko_csv)
+head(ko_csv)
+```
+
+
+\pagebreak 
+
+2. Histogram
+
+(i) dCorN: The red vertical line represents the 95-th percentile of the distribution.
+
+```{r}
+hist( x = ko_csv$dCorN,  main = 'dCorN', xlab = 'maximum value of dCorN profile, using knockoff samples', breaks = 'fd' )
+abline(v = quantile(ko_csv$dCorN, probs = 0.95), col = "red")
+```
+
+
+\pagebreak 
+
+(ii) dCorIG: The red vertical line represents the 95-th percentile of the distribution.
+
+```{r}
+hist( x = ko_csv$dCorIG, main = 'dCorIG', xlab = 'maximum value of dCorIG profile, using knockoff samples', breaks = 'fd' )
+abline(v = quantile(ko_csv$dCorIG, probs = 0.95), col = "red")
+```
+
+
+
+3. Calculate pvalue
+
+The maximum of dCorN is `r max(dCorN) ` and the maximum of dCorIG is `r max(dCorIG_Profile)`.
+```{r}
+mean( ko_csv[,"dCorN" ]  >=  max(dCorN)          )
+mean( ko_csv[,"dCorIG"]  >=  max(dCorIG_Profile) )
+```
+

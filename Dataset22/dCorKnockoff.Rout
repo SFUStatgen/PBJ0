@@ -1,0 +1,180 @@
+
+R version 3.5.0 (2018-04-23) -- "Joy in Playing"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> start.time = Sys.time()
+> # dCor knockoff-based test, based on Nknockoff simulated knockoff datasets.
+> Nknockoff <- 1000 #Increase to 1000 to make comparable to nperm in permutation testing.
+> #------------------------------------------------------------------#
+> # Setup, part 1: read in data and functions needed to simulate a 
+> # knockoff null distribution for dCorIG (and dCorN, while we're at it).
+> #------------------------------------------------------------------#
+> # 1. As no msprime datasets are uploaded to GitHub, will simulate
+> # my own. To do so I ran the following scripts from the PBJ0 directory:
+> # (i) 1_SimulateData.R, (ii) 2_part_dist.R, (iii) the first 41 lines of
+> # 4_IBD_dCorN.R and (iv) the first 59 lines of 5_IBD_dCorIG.R.
+> # The results of these scripts are stored in .RData files which
+> # can be loaded into my workspace.
+> load("sample_data.RData") # from 1_SimulateData.R
+> load("part.RData") # from 2_part_dist.R
+> load("dCorN.RData") # from 4_IBD_dCorN.R
+> load("dCorIG.RData") # from 5_IBD_dCorIG.R
+> # Load functions that do dCor-related calculations...
+> source("2_part_dist_Utillity_Functions.R") # Authors PN/BK
+> source("4_IBD_Utilitty_Functions.R") # Authors PN/BK
+> source("5_IBD_Utillity_Functions.R") # Authors PN/BK
+> source("fitknock.R") # My fitknock() function to fit the knockoff model
+> #------------------------------------------------------------------#
+> # Setup, part 2: Load packages for parallel computing and set up a "cluster" 
+> # object to distribute computations across the cluster. Lines 27-37 below 
+> # are cut-and-pasted directly from BK/PN's 4_IBD_dCorN.R script.
+> #------------------------------------------------------------------#
+> library(foreach)
+> library(doParallel)
+Loading required package: iterators
+Loading required package: parallel
+> # To run parallel on compute canada:
+> # (Ref: https://docs.computecanada.ca/wiki/R)
+> # Create an array from the NODESLIST environnement variable
+> nodeslist = unlist(strsplit(Sys.getenv("NODESLIST"), split=" "))
+> # Create the cluster with the nodes name. One process per count of node name.
+> # nodeslist = node1 node1 node2 node2, means we are starting 2 processes on node1, likewise on node2.
+> # For testing on a laptop, change the above to:  
+> cl = makeCluster(nodeslist, type = "PSOCK") 
+> registerDoParallel(cl)
+> #------------------------------------------------------------------#
+> # Create the variables, such as the case/control labels, that are 
+> # common to all knockoff datasets. Use the same variable names as BK/PN.
+> #------------------------------------------------------------------#
+> control.inds <- which(sample_data$Haps$ccStatus == 0)
+> control.haps <- t(sample_data$Haps$sample_haps[,control.inds]) # cols are haplos
+> nhaps <- ncol(sample_data$Haps$sample_haps)
+> snvnames  <- row.names(sample_data$Haps$sample_haps)
+> hapnames <- colnames(sample_data$Haps$sample_haps)
+> posns <- sample_data$Posn$SNV_Position
+> CClabels <- sample_data$Haps$ccStatus
+> SeqID <- c(sample_data$CaseHapID, sample_data$ControlHapID) 
+> cc_sample <- data.frame(SeqID = SeqID, Status = CClabels) 
+> #------------------------------------------------------------------#
+> # Generate knockoff null distributions for both dCorN and dCorIG
+> #------------------------------------------------------------------#
+> hmm <- fitknock(control.haps) #fills in the hmm els pInit, Q, pEmit used below.
+/home/pnickchi/./fastPHASE -Pp -T1 -K12 -g -H-4 -C25 -B -S1 -o'/scratch/pnickchi/Dataset22/FastPhaseDir/out' FastPhaseDir/haplotype.inpseed = 1590772836
+
+This is fastPHASE 1.4.8
+
+Copyright 2005-2006.  University of Washington. All rights reserved.
+Written by Paul Scheet, with algorithm developed by Paul Scheet and
+Matthew Stephens in the Department of Statistics at the University of
+Washington.  Please contact pscheet@alum.wustl.edu for questions, or to
+obtain the software visit
+http://stephenslab.uchicago.edu/software.html
+
+0 diploids below missingness threshold, 100 haplotypes
+ data read successfully
+0 diploid individuals, 1327 loci
+100 haplotypes 
+
+K selected (by user): 		 12
+seed: 			 1
+no. EM starts: 		 1
+EM iterations: 		 25
+no. haps from posterior: -4
+NOT using subpopulation labels
+
+
+ this is random start no. 1 of 1 for the EM...
+
+seed for this start: 1
+-113234.34494847
+-22305.10775062
+-14159.98294127
+-12094.15260665
+-11251.54327217
+-10811.73644543
+-10512.87838937
+-10256.40038373
+-10089.45254400
+-9974.54319589
+-9863.77023910
+-9782.56432773
+-9705.42340228
+-9647.38784878
+-9612.76091180
+-9583.97681047
+-9554.82622236
+-9530.66789352
+-9509.73328541
+-9489.45080452
+-9470.25455994
+-9452.19555270
+-9440.55245510
+-9430.75675035
+-9421.29332277
+final loglikelihood: -9408.980530
+iterations: 25
+
+writing parameter estimates to disk
+
+
+> set.seed(123)
+> # Create a list of functions needed by each worker in the cluster.
+> export.list = c("get_GNN_statistic","get_dist_matrices","reclassify_cases_gnn",
++                 "dCor_Profile","GNN_Calculation","get_unique_part_and_weight",
++                 "dCorIG")
+> res = foreach(i = 1:Nknockoff, .export = export.list) %dopar%{
++   ko_haps <- SNPknock::sampleHMM(hmm$pInit,hmm$Q,hmm$pEmit,nhaps)
++   hapMat<-perfectphyloR::createHapMat(hapmat = ko_haps,snvNames = snvnames,
++                                     hapNames = hapnames,posns = posns)
++   #Get the full partition for all SNVs with many redundancies
++   part = perfectphyloR::reconstructPPregion(hapMat = hapMat,minWindow = 500) 
++   dists <- get_dist_matrices(part) 
++   mN <- max(dCor_Profile(cc_sample = cc_sample, dists))
++   tt <- get_unique_part_and_weight(part, sample_data) 
++   part <- tt$partition_list #Need the more efficient minimal partition for GNN
++   weight.vector <- tt$weights #Also for GNN-based predn of non-carrier case seqs.
++   #Now get the max dCorIG statistic over the genomic region
++   mIG <- max(dCorIG(part, weight.vector, dists, CClabels = cc_sample,q_cut_off = 0.25 ))
++   c(mN, mIG) #Maximum dCorN and dCorIG statistics over the genomic region.
++ } #end %dopar%
+Warning message:
+In e$fun(obj, substitute(ex), parent.frame(), e$data) :
+  already exporting variable(s): get_GNN_statistic, get_dist_matrices, reclassify_cases_gnn, dCor_Profile, GNN_Calculation, get_unique_part_and_weight, dCorIG
+> # Results are in the list res with one element for each knockoff replicate. 
+> # Coerce to a data frame with rows corresp to ko reps and save to a .csv file.
+> ko<- t(data.frame(res))
+> row.names(ko) <- NULL
+> colnames(ko) <- c("dCorN","dCorIG")
+> write.csv(ko,file="dCorNIGko.csv",quote=FALSE,row.names=FALSE)
+> # Calculate p-value from the knockoff null distribution. NB: Unlike in
+> # permutation testing, we should *not* include the observed statistic in the 
+> # knockoff distribution
+> mean(ko[,"dCorN"] >= max(dCorN))
+[1] 0
+> mean(ko[,"dCorIG"] >= max(dCorIG_Profile))
+[1] 0
+> 
+> # Stop the cluster
+> stopCluster(cl)
+> end.time = Sys.time()
+> end.time - start.time
+Time difference of 1.90404 hours
+> 
+> proc.time()
+    user   system  elapsed 
+   9.643    3.691 6855.047 
