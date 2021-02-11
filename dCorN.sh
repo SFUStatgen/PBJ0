@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --ntasks=4               # number of processes
+#SBATCH --ntasks=100             # number of processes
 #SBATCH --mem-per-cpu=4000M      # memory; default unit is megabytes
-#SBATCH --time=0-02:59           # time (DD-HH:MM)
+#SBATCH --time=0-00:59           # time (DD-HH:MM)
 
 
 module load r/3.5.0

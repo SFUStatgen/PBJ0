@@ -1,7 +1,7 @@
 # Parameters used in msprime simulation
 # The following parameters have been set in simulation_in_msprime.py script.
 # Ne (effective diploid population size) = 3100, European population, Tenesa et al paper
-# mutation and recombination rate = 1e-8  per base per generation
+# mutation and recombination rate = 2e-8 and 1e-8  per base per generation, respectively.
 # Sequence length = 2 Mbp  (2e6 bp)
 # Number of sequences = 6200
 # demographic_events=[msprime.SimulationModelChange(time=5000, model="hudson")]
@@ -29,14 +29,15 @@ source('1_SimulateData_Utillity_Functions.R')
 #    (In our current simulations this value is 155)
 #    (Refer to N0_N1_Calcl_Formula.pdf file for more details)
 #
-# 3. Aim for 4 equifrequent causal SNVs. These cSNVs need to have clade sizes of around 39 (= 155 / 4) in the population. 
-#    and be around 12 ( = 50/4) in the sample too. Since we have 50 case sequences that are carrying one copy, 
-#    it would be nice to have around 4 equifrequent causal SNVs in the sample with clade size of around 12.
+# 3. Aim for 15 equifrequent causal SNVs. These cSNVs need to have clade sizes of around 10 (= 155 / 15) in the population.
+#
+# 4. If needed, randomly choose more causal SNVs to gaurantee that the disease probability in population is close enough to 5%.
+# (0.047 - 0.053)
 #
 pop_data = Simulate_Population_Data(prob_disease = 0.05,
                                     causal_region = c(900000,1100000),
                                     N1 = 155, 
-                                    equifrequent_cSNV = 6, 
+                                    equifrequent_cSNV = 15, 
                                     Beta0 = -10,
                                     Beta  = 16
                                     )
@@ -46,7 +47,6 @@ pop_data = Simulate_Population_Data(prob_disease = 0.05,
 
 
 # Step 3. Randomly sample 50 case and 50 control individuals from the population.
-# We keep sampling until in our sample, the number of sequences that are carrying each cSNV is at least around 12 ( = 50/4).
 #
 # We use the Sample_from_population() function. Parameters of this function:
 # 
@@ -123,12 +123,11 @@ for(i in 1:nperm){
 #
 # Important note:
 # Make sure that all the files and scripts for each simulated dataset are at the same directory. 
-# Otherwisw this file would not load.
 #
 
 save(pop_data,         file = "pop_data.RData")
 save(sample_data,      file = "sample_data.RData")
-save(x = permute_indx, file = 'permute_indx.RData')
+save(permute_indx,     file = 'permute_indx.RData')
 
 
 
