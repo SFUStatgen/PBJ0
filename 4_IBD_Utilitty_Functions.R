@@ -23,7 +23,7 @@ dCor_Profile           = function(cc_sample, distance_matrix_list){
   
   
   # Returns dCor_Stat, a numeric vector, recording the dCor value across the region.
-  return(sqrt(dCor_Stat))
+  return(dCor_Stat)
   
 }
 
