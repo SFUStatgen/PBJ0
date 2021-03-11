@@ -7,7 +7,7 @@ source('GetNullSample_Utillity_Functions.R')
 for( dataset_index in 1:500 ){
 
     #
-    # Load the original pop data and sample data
+    # Load the original pop data (simulated under alternative)
     #
     load( paste0('Dataset', dataset_index, '/pop_data.RData') )
     
