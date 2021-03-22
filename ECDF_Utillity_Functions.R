@@ -104,7 +104,7 @@ get_localization_results = function(path){
 
   if( file.exists(paste0(path, "Mantel.RData")) ){
     load( paste0(path, "Mantel.RData") )
-    max.indx            = which.max( abs(Mantel) )
+    max.indx            = which.max( Mantel^2 )
     average_distance[4] = avgPeakDist( peakposn = pos[max.indx], region = c(900000,1100000) )
   }else{
     average_distance[4] = NA
@@ -170,7 +170,7 @@ get_detection_results    = function(path){
   if( file.exists(paste0(path, "Mantel_perm.RData")) ){
     load( paste0(path, "Mantel_perm.RData") )
     n_perm = nrow(Mantel_permutation) - 1
-    perms = apply(X = abs(Mantel_permutation) , MARGIN = 1, FUN = max)
+    perms = apply(X = Mantel_permutation^2 , MARGIN = 1, FUN = max)
     pvalue[4] = mean( perms >= perms[ n_perm + 1 ] )
   }else{
     pvalue[4] = NA
