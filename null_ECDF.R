@@ -3,15 +3,10 @@
 #
 source('null_ECDF_Utillity_Functions.R')
 
-
-
-
 #
 # Define the main directory where 500 datasets are located
 #
 main_path = "D:/Research/Project1/Simulations/msprime/WrightFisherModel/SearchForExampleDataset_July28/"
-
-
 
 #####  Detection ####
 #
