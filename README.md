@@ -17,3 +17,4 @@ The analyses for this second "null" phase are NOT documented (except for here in
 but pertain to the scripts: GetNullSample.R, GetNullSample_Utillity_Functions.R,
 null_ECDF.R and null_ECDF_Utillity_Functions.R in the repository.
 
+Queries may be directed to Payman Nickchi at pnickchi@sfu.ca or Charith Karunarathna at ch757276@dal.ca.
