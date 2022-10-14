@@ -1,8 +1,8 @@
 # PBJ0
-Repository for Payman, Bhagya and Jinko's project: 
-"An exploration of linkage fine-mapping on sequences from case-control studies".
+Repository for the project "An exploration of linkage fine-mapping on sequences from case-control studies"
+of Payman Nickchi, Charith (Bhagya) Karunarathna and Jinko Graham
 
-Initially, for 500 populations, Payman and Bhagya simulated:
+Initially, for 500 populations, Payman and Bhagya (Charith) simulated:
 - SNV sequences for the entire population using msprime and
 - phenotypes under the ALTERNATIVE HYPOTHESIS OF ASSOCIATION for the entire population.
 They then randomly sampled 50 case individuals and 50 control (non-case) individuals
@@ -17,3 +17,4 @@ The analyses for this second "null" phase are NOT documented (except for here in
 but pertain to the scripts: GetNullSample.R, GetNullSample_Utillity_Functions.R,
 null_ECDF.R and null_ECDF_Utillity_Functions.R in the repository.
 
+Queries may be directed to Payman Nickchi at pnickchi@sfu.ca or Bhagya (Charith) Karunarathna at ch757276@dal.ca.
