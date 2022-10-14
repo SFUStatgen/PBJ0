@@ -130,11 +130,6 @@ save(sample_data,      file = "sample_data.RData")
 save(permute_indx,     file = 'permute_indx.RData')
 
 
-
-
-
-
-
 # Optional step
 #
 # We only run this stage as it saves us time later when we pick a dataset as example dataset and we want 
